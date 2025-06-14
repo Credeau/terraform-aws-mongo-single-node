@@ -1,0 +1,162 @@
+#!/bin/bash
+
+# -----------------------------------------------
+# Pre-Requisites
+# -----------------------------------------------
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+cd /home/ubuntu
+
+sudo apt update
+
+# Install tools required in the script ahead
+sudo apt install -y wget curl gpg gnupg net-tools unzip
+sudo apt install -y e2fsprogs coreutils python3 python3-pip cron
+
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# -----------------------------------------------
+# Prepare and mount EBS volume for MongoDB
+# -----------------------------------------------
+
+VOLUME_LABEL="mongo_data"
+MOUNT_PATH="$${mongo_data_location:-/var/lib/mongodb}"
+
+echo "⏳ Waiting for non-root EBS device to appear..."
+
+# Exclude root disk (nvme0n1 or xvda depending on instance type)
+for i in {1..30}; do
+  POTENTIAL_DEV=$(lsblk -ndo NAME,TYPE | grep disk | awk '{print $1}' | grep -v -E 'nvme0n1|xvda' | head -n 1)
+  if [ -n "$POTENTIAL_DEV" ]; then
+    VOLUME_DEVICE="/dev/$POTENTIAL_DEV"
+    echo "✅ Found EBS device at $VOLUME_DEVICE"
+    break
+  fi
+  sleep 2
+done
+
+if [ -z "$VOLUME_DEVICE" ]; then
+  echo "❌ Could not find non-root EBS device."
+  exit 1
+fi
+
+# Format and label if necessary
+if ! blkid "$VOLUME_DEVICE" | grep "$VOLUME_LABEL"; then
+  echo "🔧 Formatting $VOLUME_DEVICE as ext4 and labeling as $VOLUME_LABEL"
+  sudo mkfs.ext4 -L "$VOLUME_LABEL" "$VOLUME_DEVICE"
+fi
+
+# Create mount path if not exists
+sudo mkdir -p "$MOUNT_PATH"
+
+# Mount using label
+sudo mount -L "$VOLUME_LABEL" "$MOUNT_PATH"
+
+# Persist in fstab
+if ! grep -qs "$MOUNT_PATH" /etc/fstab; then
+  echo "LABEL=$VOLUME_LABEL $MOUNT_PATH ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab
+fi
+
+echo "✅ Volume mount is complete at $MOUNT_PATH"
+
+# -----------------------------------------------
+# MongoDB installation & Configuration
+# -----------------------------------------------
+
+# Add Mongo debian package repository on apt
+sudo rm -f /usr/share/keyrings/mongodb-server-7.0.gpg
+curl -fsSL https://pgp.mongodb.com/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+# Update the local references from newly added package
+sudo apt-get update
+
+# Install MongoDB
+sudo apt-get install -y mongodb-org
+
+# Set correct ownership and permissions for MongoDB
+sudo chown -R mongodb:mongodb "$MOUNT_PATH"
+sudo chmod 755 "$MOUNT_PATH"
+
+# Start MongoDB service
+sudo systemctl start mongod
+
+# Wait for MongoDB to become available
+until mongosh --eval "db.adminCommand('ping')" &>/dev/null; do
+  echo "Waiting for MongoDB to start..."
+  sleep 1
+done
+
+# Create root credentials if not already exists
+mongosh admin --quiet --eval '
+  if (!db.getUser("${mongo_user_name}")) {
+    db.createUser({
+      user: "${mongo_user_name}",
+      pwd: "${mongo_password}",
+      roles: [
+        { role: "clusterMonitor", db: "admin" },
+        { role: "root", db: "admin" }
+      ]
+    });
+  }'
+
+# Download mongod root config from S3 
+sudo aws s3 cp ${mongo_config_s3_uri} /etc/mongod.conf
+
+# Restart the service to apply changes made to the service
+sudo systemctl restart mongod
+
+# Enable mongod to auto-start on boot
+sudo systemctl enable mongod
+
+# Create a systemd override for mongod to improve resilience and resource limits
+sudo mkdir -p /etc/systemd/system/mongod.service.d
+
+# Download override config from S3
+sudo aws s3 cp ${mongod_service_override_s3_uri} /etc/systemd/system/mongod.service.d/override.conf
+
+# Reload systemd and restart mongod with the new overrides
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl restart mongod
+
+echo "✅ MongoDB installation and configuration is complete"
+
+# -----------------------------------------------
+# Install & Configure Monitoring Agents & Scripts
+# -----------------------------------------------
+
+# Allow commands to fail without stopping the script as all steps below 
+# are only for monitoring setup which is not critical to MongoDB setup
+set +e
+
+# Download custom cloudwatch agent configuration to export essential infrastructure metrics from S3
+aws s3 cp ${cloudwatch_config_s3_uri} /home/ubuntu/cwa_config.json
+
+# Install the AWS CloudWatch Agent
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+
+# Import custom cloudwatch agent configuration
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/home/ubuntu/cwa_config.json
+
+# Start and enable cloudwatch agent
+sudo systemctl start amazon-cloudwatch-agent
+sudo systemctl enable amazon-cloudwatch-agent
+
+# Download custom python script to export MongoInternal metrics to cloudwatch from S3
+aws s3 cp ${cloudwatch_script_s3_uri} /home/ubuntu/mongo_cloudwatch.py
+chmod +x /home/ubuntu/mongo_cloudwatch.py
+
+# Prepare python environment to execute the script
+pip3 install pymongo boto3
+
+# Set a cron schedule to invoke this custom metrics collection script periodically
+(crontab -l 2>/dev/null; echo "* * * * * /usr/bin/python3 /home/ubuntu/mongo_cloudwatch.py -u ${mongo_user_name} -P ${mongo_password} -i ${application_identifier}") | crontab -
+
+echo "✅ MongoDB setup is complete"

@@ -1,0 +1,7 @@
+[Service]
+Environment="MONGODB_CONFIG_OVERRIDE_NOFORK=1"
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=64000
+LimitNPROC=64000
+LimitMEMLOCK=infinity

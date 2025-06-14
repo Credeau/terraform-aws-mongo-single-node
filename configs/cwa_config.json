@@ -1,0 +1,42 @@
+{
+    "metrics": {
+        "namespace": "MongoDBMetrics",
+        "metrics_collected": {
+            "disk": {
+                "measurement": [
+                    {
+                        "name": "disk_used_percent",
+                        "rename": "MongoDBDiskUsedPercent"
+                    }
+                ],
+                "resources": [
+                    "/"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "mem": {
+                "measurement": [
+                    {
+                        "name": "mem_used_percent",
+                        "rename": "MongoDBMemUsedPercent"
+                    }
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/var/log/mongodb/mongod.log",
+                        "log_group_name": "MongoDBLogs",
+                        "log_stream_name": "${application_identifier}_mongod",
+                        "timestamp_format": "%Y-%m-%d %H:%M:%S"
+                    }
+                ]
+            }
+        }
+    }
+}
