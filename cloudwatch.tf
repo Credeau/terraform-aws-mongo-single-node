@@ -10,7 +10,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage" {
   threshold           = var.cpu_threshold
 
   dimensions = {
-    InstanceId = aws_instance.kafka.id
+    InstanceId = aws_instance.mongo.id
   }
 
   alarm_actions = [
@@ -30,11 +30,10 @@ resource "aws_cloudwatch_metric_alarm" "memory_usage" {
   threshold           = var.memory_threshold
 
   dimensions = {
-    InstanceId = aws_instance.kafka.id
+    InstanceId = aws_instance.mongo.id
   }
 
   alarm_actions = [
-    aws_autoscaling_policy.upscale.arn,
     aws_sns_topic.alert_topic.arn
   ]
 }
@@ -51,7 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_usage" {
   threshold           = var.disk_threshold
 
   dimensions = {
-    InstanceId = aws_instance.kafka.id
+    InstanceId = aws_instance.mongo.id
   }
 
   alarm_actions = [
