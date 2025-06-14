@@ -4,6 +4,9 @@ resource "aws_instance" "mongo" {
   key_name             = var.key_pair_name
   iam_instance_profile = aws_iam_instance_profile.mongo.name
 
+  disable_api_stop        = true
+  disable_api_termination = true
+
   network_interface {
     device_index         = 0
     network_interface_id = aws_network_interface.mongo_eni.id
