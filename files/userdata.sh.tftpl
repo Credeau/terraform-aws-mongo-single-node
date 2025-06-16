@@ -79,6 +79,18 @@ fi
 echo "✅ Volume mount is complete at $MOUNT_PATH"
 
 # -----------------------------------------------
+# Expand filesystem after resize (if needed)
+# -----------------------------------------------
+
+# Resolve correct device from mount
+VOLUME_DEVICE=$(findmnt -n -o SOURCE --target "$MOUNT_PATH")
+
+if mountpoint -q "$MOUNT_PATH" && sudo blkid "$VOLUME_DEVICE" | grep -q "TYPE=\"ext4\""; then
+  echo "📏 Resizing ext4 filesystem on $VOLUME_DEVICE"
+  sudo resize2fs "$VOLUME_DEVICE"
+fi
+
+# -----------------------------------------------
 # MongoDB installation & Configuration
 # -----------------------------------------------
 
