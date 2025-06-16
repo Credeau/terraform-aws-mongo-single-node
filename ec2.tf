@@ -1,5 +1,5 @@
 resource "aws_instance" "mongo" {
-  ami                  = data.aws_ami.ubuntu.id
+  ami                  = local.ubuntu_ami_id
   instance_type        = var.instance_type
   key_name             = var.key_pair_name
   iam_instance_profile = aws_iam_instance_profile.mongo.name
