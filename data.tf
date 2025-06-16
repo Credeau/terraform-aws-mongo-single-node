@@ -3,7 +3,7 @@ data "aws_subnet" "main" {
   id = var.subnet_id
 }
 
-# Fetch latest Ubuntu 22.04 AMI
+# Fetch AMI Id for mongo instance
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
@@ -19,6 +19,29 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-data "aws_route_table" "subnet_route" {
-  subnet_id = var.subnet_id
+# Prevents changing the data path after the first run
+resource "aws_ssm_parameter" "data_path" {
+  name        = local.ssm_data_path_parameter_name
+  description = "MongoDB data storage path (Caution! do not alter this manually)"
+  type        = "String"
+  value       = var.mongo_data_location
+  overwrite   = false  # This ensures we don't overwrite the value once set
+}
+
+# Prevents changing the data path after the first run
+resource "aws_ssm_parameter" "compression_type" {
+  name        = local.ssm_compression_type_parameter_name
+  description = "MongoDB data storage compression type (Caution! do not alter this manually)"
+  type        = "String"
+  value       = var.mongo_default_storage_compression_type
+  overwrite   = false  # This ensures we don't overwrite the value once set
+}
+
+# Prevents changing the data path after the first run
+resource "aws_ssm_parameter" "port" {
+  name        = local.ssm_port_parameter_name
+  description = "MongoDB port (Caution! do not alter this manually)"
+  type        = "String"
+  value       = var.mongo_port
+  overwrite   = false  # This ensures we don't overwrite the value once set
 }

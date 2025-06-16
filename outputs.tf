@@ -63,3 +63,13 @@ output "volume_mount_path" {
 output "instance_id" {
   value = aws_instance.mongo.id
 }
+
+# Backup enabled flag
+output "backup_enabled" {
+  value = var.enable_backup
+}
+
+# Mongo storage disk backup vault name
+output "backup_vault_name" {
+  value = var.enable_backup ? aws_backup_vault.mongo_ebs_backup[0].name : null
+}
