@@ -97,7 +97,7 @@ until mongosh --eval "db.adminCommand('ping')" &>/dev/null; do
   sleep 1
 done
 
-# Create root credentials if not already exists
+# Create root credentials if not already exists, else update the password
 mongosh admin --quiet --eval '
   if (!db.getUser("${mongo_user_name}")) {
     db.createUser({
@@ -108,7 +108,10 @@ mongosh admin --quiet --eval '
         { role: "root", db: "admin" }
       ]
     });
-  }'
+  } else {
+    db.changeUserPassword("${mongo_user_name}", "${mongo_password}");
+  }
+'
 
 # Download mongod root config from S3 
 sudo aws s3 cp ${mongo_config_s3_uri} /etc/mongod.conf
