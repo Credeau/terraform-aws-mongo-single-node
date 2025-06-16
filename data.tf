@@ -41,7 +41,7 @@ data "aws_ssm_parameter" "data_path" {
   name = local.ssm_data_path_parameter_name
 }
 
-resource "aws_ssm_parameter" "ubuntu_ami" {
+resource "aws_ssm_parameter" "data_path" {
   name        = local.ssm_data_path_parameter_name
   description = "MongoDB data storage path (Caution! do not alter this manually)"
   type        = "String"
