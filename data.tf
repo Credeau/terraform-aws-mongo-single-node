@@ -35,3 +35,16 @@ resource "aws_ssm_parameter" "ubuntu_ami" {
   value       = data.aws_ami.ubuntu.id
   overwrite   = false  # This ensures we don't overwrite the value once set
 }
+
+# Fetch data path for mongo installation
+data "aws_ssm_parameter" "data_path" {
+  name = local.ssm_data_path_parameter_name
+}
+
+resource "aws_ssm_parameter" "ubuntu_ami" {
+  name        = local.ssm_data_path_parameter_name
+  description = "MongoDB data storage path (Caution! do not alter this manually)"
+  type        = "String"
+  value       = var.mongo_data_location
+  overwrite   = false  # This ensures we don't overwrite the value once set
+}
