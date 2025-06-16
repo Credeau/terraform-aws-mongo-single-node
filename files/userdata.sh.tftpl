@@ -9,6 +9,8 @@ if [[ -z "${mongo_user_name}" || -z "${mongo_password}" ]]; then
   exit 1
 fi
 
+echo "mongo disk size: ${disk_size}"
+
 # -----------------------------------------------
 # Pre-Requisites
 # -----------------------------------------------

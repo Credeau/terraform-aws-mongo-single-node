@@ -24,6 +24,7 @@ resource "aws_instance" "mongo" {
     mongo_user_name                = var.mongo_user_name
     mongo_password                 = var.mongo_password
     mongo_port                     = aws_ssm_parameter.port.value
+    disk_size                      = var.disk_size # This is added to make the server re-execute the userdata script if the disk size is changed
     application_identifier         = local.stack_identifier
     mongo_data_location            = aws_ssm_parameter.data_path.value
     cloudwatch_script_s3_uri       = format("s3://%s/%s", aws_s3_bucket.mongo_assets.bucket, aws_s3_object.mongo_cloudwatch_script.key)
