@@ -37,9 +37,9 @@ resource "aws_s3_object" "mongod_config" {
   key    = "config/mongod.conf"
 
   content = templatefile("${path.module}/configs/mongod.conf", {
-    compression_type    = var.mongo_default_storage_compression_type
-    port                = var.mongo_port
-    mongo_data_location = var.mongo_data_location
+    compression_type    = aws_ssm_parameter.compression_type.value
+    port                = aws_ssm_parameter.port.value
+    mongo_data_location = aws_ssm_parameter.data_path.value
   })
 
   content_type = "text/plain"
