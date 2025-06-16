@@ -7,13 +7,18 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Prevent interactive prompts during package installation
+export DEBIAN_FRONTEND=noninteractive
+
 cd /home/ubuntu
 
+# Update package lists and handle potential kernel updates
 sudo apt update
+sudo apt-get -y upgrade --no-install-recommends
 
 # Install tools required in the script ahead
-sudo apt install -y wget curl gpg gnupg net-tools unzip
-sudo apt install -y e2fsprogs coreutils python3 python3-pip cron
+sudo apt-get install -y --no-install-recommends wget curl gpg gnupg net-tools unzip
+sudo apt-get install -y --no-install-recommends e2fsprogs coreutils python3 python3-pip cron
 
 # Install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -77,7 +82,7 @@ echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gp
 sudo apt-get update
 
 # Install MongoDB
-sudo apt-get install -y mongodb-org
+sudo apt-get install -y --no-install-recommends mongodb-org
 
 # Set correct ownership and permissions for MongoDB
 sudo chown -R mongodb:mongodb "$MOUNT_PATH"
