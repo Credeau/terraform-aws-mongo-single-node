@@ -32,7 +32,7 @@ resource "aws_ssm_parameter" "ubuntu_ami" {
   name        = local.ssm_ami_parameter_name
   description = "Ubuntu AMI ID for MongoDB instance (Caution! do not alter this manually)"
   type        = "String"
-  value       = data.aws_ami.ubuntu.id
+  value       = data.aws_ami.ubuntu[0].id
   overwrite   = false  # This ensures we don't overwrite the value once set
 }
 
