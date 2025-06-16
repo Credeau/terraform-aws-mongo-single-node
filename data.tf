@@ -32,7 +32,7 @@ resource "aws_ssm_parameter" "ubuntu_ami" {
   name        = local.ssm_ami_parameter_name
   description = "Ubuntu AMI ID for MongoDB instance (Caution! do not alter this manually)"
   type        = "String"
-  value       = data.aws_ami.ubuntu[0].id
+  value       = local.ubuntu_ami_id
   overwrite   = false  # This ensures we don't overwrite the value once set
 }
 
@@ -45,6 +45,6 @@ resource "aws_ssm_parameter" "data_path" {
   name        = local.ssm_data_path_parameter_name
   description = "MongoDB data storage path (Caution! do not alter this manually)"
   type        = "String"
-  value       = var.mongo_data_location
+  value       = local.mongo_data_path
   overwrite   = false  # This ensures we don't overwrite the value once set
 }
