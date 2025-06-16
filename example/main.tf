@@ -8,7 +8,7 @@ data "aws_ssm_parameter" "mongo_password" {
 }
 
 module "mongodb" {
-  source = "git::https://github.com/credeau/terraform-aws-mongo-single-node.git?ref=v1.0.0"
+  source = "git::https://github.com/credeau/terraform-aws-mongo-single-node.git?ref=v1.0.1"
 
   application                            = "mobile-forge"
   environment                            = "prod"
@@ -37,6 +37,9 @@ module "mongodb" {
   encrypt_storage                        = true
   base_snapshot_id                       = null
   mongo_data_location                    = "/var/lib/mongodb"
+  enable_backup                          = true
+  backup_schedule                        = "cron(0 0 ? * * *)"
+  backup_retention_days                  = 7
 }
 
 output "mongodb" {
