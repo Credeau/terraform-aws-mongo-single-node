@@ -1,6 +1,15 @@
 #!/bin/bash
 
 # -----------------------------------------------
+# Pre-Execution Checks
+# -----------------------------------------------
+
+if [[ -z "${mongo_user_name}" || -z "${mongo_password}" ]]; then
+  echo "❌ Mongo user credentials not provided"
+  exit 1
+fi
+
+# -----------------------------------------------
 # Pre-Requisites
 # -----------------------------------------------
 
@@ -166,5 +175,47 @@ pip3 install pymongo boto3
 
 # Set a cron schedule to invoke this custom metrics collection script periodically
 (crontab -l 2>/dev/null; echo "* * * * * /usr/bin/python3 /home/ubuntu/mongo_cloudwatch.py -u ${mongo_user_name} -P ${mongo_password} -i ${application_identifier}") | crontab -
+
+echo "✅ MongoDB monitoring setup is complete"
+
+# -----------------------------------------------
+# Post-Execution Checks
+# -----------------------------------------------
+
+# After starting MongoDB service
+if ! systemctl is-active --quiet mongod; then
+    echo "❌ MongoDB service failed to start"
+    exit 1
+fi
+
+# Check if MongoDB is listening on the correct port
+if ! netstat -tuln | grep -q ":${mongo_port}"; then
+    echo "❌ MongoDB is not listening on port ${mongo_port}"
+    exit 1
+fi
+
+# After CloudWatch agent installation
+if ! systemctl is-active --quiet amazon-cloudwatch-agent; then
+    echo "❌ CloudWatch agent failed to start"
+    exit 1
+fi
+
+# Verify CloudWatch agent configuration
+if [ ! -f /home/ubuntu/cwa_config.json ]; then
+    echo "❌ CloudWatch agent configuration file not found"
+    exit 1
+fi
+
+# After Python package installation
+if ! python3 -c "import pymongo, boto3" &> /dev/null; then
+    echo "❌ Required Python packages not installed"
+    exit 1
+fi
+
+# After setting up cron job
+if ! crontab -l | grep -q "mongo_cloudwatch.py"; then
+    echo "❌ CloudWatch metrics cron job not set up"
+    exit 1
+fi
 
 echo "✅ MongoDB setup is complete"
