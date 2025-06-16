@@ -4,15 +4,7 @@ data "aws_subnet" "main" {
 }
 
 # Fetch AMI Id for mongo instance
-# 1. Try to read existing AMI ID from SSM Parameter Store first
-data "aws_ssm_parameter" "ubuntu_ami" {
-  name = local.ssm_ami_parameter_name
-}
-
-# 2. Fetch latest Ubuntu 22.04 AMI if the ssm parameter is not found
 data "aws_ami" "ubuntu" {
-  count = data.aws_ssm_parameter.ubuntu_ami.id == null ? 1 : 0
-
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
@@ -27,24 +19,11 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# 3. Store the AMI ID in SSM Parameter Store
-resource "aws_ssm_parameter" "ubuntu_ami" {
-  name        = local.ssm_ami_parameter_name
-  description = "Ubuntu AMI ID for MongoDB instance (Caution! do not alter this manually)"
-  type        = "String"
-  value       = local.ubuntu_ami_id
-  overwrite   = false  # This ensures we don't overwrite the value once set
-}
-
-# Fetch data path for mongo installation
-data "aws_ssm_parameter" "data_path" {
-  name = local.ssm_data_path_parameter_name
-}
-
+# Prevents changing the data path after the first run
 resource "aws_ssm_parameter" "data_path" {
   name        = local.ssm_data_path_parameter_name
   description = "MongoDB data storage path (Caution! do not alter this manually)"
   type        = "String"
-  value       = local.mongo_data_path
+  value       = var.mongo_data_location
   overwrite   = false  # This ensures we don't overwrite the value once set
 }

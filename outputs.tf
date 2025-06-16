@@ -28,7 +28,7 @@ output "availability_zone" {
 
 # AMI ID of the Ubuntu image used for MongoDB instance
 output "ami_id" {
-  value = local.ubuntu_ami_id
+  value = data.aws_ami.ubuntu.id
 }
 
 # Bucket on which the MongoDB bootstrap assets are uploaded

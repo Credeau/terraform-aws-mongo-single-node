@@ -12,7 +12,4 @@ locals {
   ssm_config_path_prefix       = format("/%s/%s/mongo", var.organization, local.stack_identifier)
   ssm_ami_parameter_name       = format("%s/ubuntu-ami-id", local.ssm_config_path_prefix)
   ssm_data_path_parameter_name = format("%s/data-path", local.ssm_config_path_prefix)
-
-  ubuntu_ami_id = data.aws_ssm_parameter.ubuntu_ami.id == null ? data.aws_ami.ubuntu[0].id : data.aws_ssm_parameter.ubuntu_ami.value
-  mongo_data_path = data.aws_ssm_parameter.data_path.id == null ? var.mongo_data_location : data.aws_ssm_parameter.data_path.value
 }

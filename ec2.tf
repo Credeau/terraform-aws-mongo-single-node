@@ -1,5 +1,5 @@
 resource "aws_instance" "mongo" {
-  ami                  = local.ubuntu_ami_id
+  ami                  = data.aws_ami.ubuntu.id
   instance_type        = var.instance_type
   key_name             = var.key_pair_name
   iam_instance_profile = aws_iam_instance_profile.mongo.name
@@ -25,7 +25,7 @@ resource "aws_instance" "mongo" {
     mongo_password                 = var.mongo_password
     mongo_port                     = var.mongo_port
     application_identifier         = local.stack_identifier
-    mongo_data_location            = local.mongo_data_path
+    mongo_data_location            = var.mongo_data_location
     cloudwatch_script_s3_uri       = format("s3://%s/%s", aws_s3_bucket.mongo_assets.bucket, aws_s3_object.mongo_cloudwatch_script.key)
     mongo_config_s3_uri            = format("s3://%s/%s", aws_s3_bucket.mongo_assets.bucket, aws_s3_object.mongod_config.key)
     mongod_service_override_s3_uri = format("s3://%s/%s", aws_s3_bucket.mongo_assets.bucket, aws_s3_object.mongod_service_override_config.key)
