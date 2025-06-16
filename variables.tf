@@ -193,3 +193,21 @@ variable "mongo_data_location" {
   description = "Directory location where MOngoDB will store its data"
   default     = "/var/lib/mongodb"
 }
+
+variable "enable_backup" {
+  type        = bool
+  description = "Enable/Disable the backup of the mongo ebs volume"
+  default     = false
+}
+
+variable "backup_schedule" {
+  type        = string
+  description = "Schedule for the backup"
+  default     = "cron(0 0 ? * * *)"
+}
+
+variable "backup_retention_days" {
+  type        = number
+  description = "Retention days for the backup"
+  default     = 7
+}

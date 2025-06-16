@@ -48,3 +48,27 @@ resource "aws_iam_role_policy" "main" {
     ]
   })
 }
+
+resource "aws_iam_role" "backup_role" {
+  name = format("%s-backup-role", local.stack_identifier)
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "backup.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "backup_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+  role       = aws_iam_role.backup_role.name
+}

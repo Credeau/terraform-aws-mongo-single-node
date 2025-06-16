@@ -20,13 +20,18 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_backup_plan.mongo_ebs_backup](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_plan) | resource |
+| [aws_backup_selection.mongo_backup_selection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_selection) | resource |
+| [aws_backup_vault.mongo_ebs_backup](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_vault) | resource |
 | [aws_cloudwatch_metric_alarm.cpu_usage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.disk_usage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.memory_usage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_ebs_volume.mongo_data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ebs_volume) | resource |
 | [aws_iam_instance_profile.mongo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_role.backup_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy_attachment.backup_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ssh_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_instance.mongo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_network_interface.mongo_eni](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
@@ -50,11 +55,14 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_alert_email_recipients"></a> [alert\_email\_recipients](#input\_alert\_email\_recipients) | email recipients for sns alerts | `list(string)` | `[]` | no |
 | <a name="input_application"></a> [application](#input\_application) | Application name for which this database is provisioned | `string` | `"dummy"` | no |
+| <a name="input_backup_retention_days"></a> [backup\_retention\_days](#input\_backup\_retention\_days) | Retention days for the backup | `number` | `7` | no |
+| <a name="input_backup_schedule"></a> [backup\_schedule](#input\_backup\_schedule) | Schedule for the backup | `string` | `"cron(0 0 ? * * *)"` | no |
 | <a name="input_base_snapshot_id"></a> [base\_snapshot\_id](#input\_base\_snapshot\_id) | ID of an existing EBS snapshot to create the volume from. If not specified, an empty volume will be created. | `string` | `null` | no |
 | <a name="input_cpu_threshold"></a> [cpu\_threshold](#input\_cpu\_threshold) | CPU threshold for scaling | `number` | `60` | no |
 | <a name="input_disk_iops"></a> [disk\_iops](#input\_disk\_iops) | IOPS to provision in database storage | `number` | `3000` | no |
 | <a name="input_disk_size"></a> [disk\_size](#input\_disk\_size) | Size in GBs to provision as database storage | `number` | `50` | no |
 | <a name="input_disk_threshold"></a> [disk\_threshold](#input\_disk\_threshold) | Disk threshold for scaling | `number` | `70` | no |
+| <a name="input_enable_backup"></a> [enable\_backup](#input\_enable\_backup) | Enable/Disable the backup of the mongo ebs volume | `bool` | `false` | no |
 | <a name="input_encrypt_storage"></a> [encrypt\_storage](#input\_encrypt\_storage) | Enable/Disable the encryption of database storage | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Provisioning environment | `string` | `"dev"` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Type of instance to provision for mongo | `string` | `"t3a.medium"` | no |
@@ -84,6 +92,8 @@ No modules.
 | <a name="output_application_identifier"></a> [application\_identifier](#output\_application\_identifier) | Common application-specific identifier used for tagging and metric grouping |
 | <a name="output_assets_bucket"></a> [assets\_bucket](#output\_assets\_bucket) | Bucket on which the MongoDB bootstrap assets are uploaded |
 | <a name="output_availability_zone"></a> [availability\_zone](#output\_availability\_zone) | Availability zone in which the MongoDB resources are deployed |
+| <a name="output_backup_enabled"></a> [backup\_enabled](#output\_backup\_enabled) | Backup enabled flag |
+| <a name="output_backup_vault_name"></a> [backup\_vault\_name](#output\_backup\_vault\_name) | Mongo storage disk backup vault name |
 | <a name="output_host_address"></a> [host\_address](#output\_host\_address) | The resolved IP address of the MongoDB instance (public or private based on setup) |
 | <a name="output_iam_role_arn"></a> [iam\_role\_arn](#output\_iam\_role\_arn) | IAM role ARN attached to the MongoDB instances |
 | <a name="output_instance_id"></a> [instance\_id](#output\_instance\_id) | EC2 instance ID for the MongoDB host |
