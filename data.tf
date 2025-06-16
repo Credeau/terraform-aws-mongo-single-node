@@ -18,7 +18,3 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 }
-
-data "aws_route_table" "subnet_route" {
-  subnet_id = var.subnet_id
-}
