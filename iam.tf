@@ -44,6 +44,22 @@ resource "aws_iam_role_policy" "main" {
           "s3:GetObject"
         ],
         "Resource" : "*"
+      },
+      {
+        "Sid" : "PutCustomMetrics",
+        "Effect" : "Allow",
+        "Action" : "cloudwatch:PutMetricData",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "WriteCloudWatchLogs",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
       }
     ]
   })
