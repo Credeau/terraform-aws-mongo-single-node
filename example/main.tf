@@ -8,7 +8,7 @@ data "aws_ssm_parameter" "mongo_password" {
 }
 
 module "mongodb" {
-  source = "git::https://github.com/credeau/terraform-aws-mongo-single-node.git?ref=v1.0.1"
+  source = "git::https://github.com/credeau/terraform-aws-mongo-single-node.git?ref=v1.0.2"
 
   application                            = "mobile-forge"
   environment                            = "prod"
