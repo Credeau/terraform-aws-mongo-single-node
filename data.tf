@@ -25,7 +25,7 @@ resource "aws_ssm_parameter" "data_path" {
   description = "MongoDB data storage path (Caution! do not alter this manually)"
   type        = "String"
   value       = var.mongo_data_location
-  overwrite   = false  # This ensures we don't overwrite the value once set
+  overwrite   = false # This ensures we don't overwrite the value once set
 }
 
 # Prevents changing the data path after the first run
@@ -34,7 +34,7 @@ resource "aws_ssm_parameter" "compression_type" {
   description = "MongoDB data storage compression type (Caution! do not alter this manually)"
   type        = "String"
   value       = var.mongo_default_storage_compression_type
-  overwrite   = false  # This ensures we don't overwrite the value once set
+  overwrite   = false # This ensures we don't overwrite the value once set
 }
 
 # Prevents changing the data path after the first run
@@ -43,5 +43,5 @@ resource "aws_ssm_parameter" "port" {
   description = "MongoDB port (Caution! do not alter this manually)"
   type        = "String"
   value       = var.mongo_port
-  overwrite   = false  # This ensures we don't overwrite the value once set
+  overwrite   = false # This ensures we don't overwrite the value once set
 }
