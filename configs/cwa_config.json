@@ -13,7 +13,7 @@
                     }
                 ],
                 "resources": [
-                    "/"
+                    "${volume_mount_path}"
                 ],
                 "metrics_collection_interval": 60
             },
