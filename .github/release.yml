@@ -1,0 +1,20 @@
+name: Release ${{ github.ref_name }}
+
+body: |
+  # Release ${{ github.ref_name }} - 
+
+  ## Overview
+
+  Brief description of what this release accomplishes and its main focus.
+
+  ## What's new?
+
+  - 
+
+  ## Breaking Changes
+
+  None
+
+  ## Change Log
+
+  **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ github.event.before }}...v${{ github.event.after }}
