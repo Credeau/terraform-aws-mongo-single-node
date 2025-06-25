@@ -58,6 +58,7 @@ resource "aws_s3_object" "cloudwatch_agent_config" {
 
   content = templatefile("${path.module}/configs/cwa_config.json", {
     application_identifier = local.stack_identifier
+    volume_mount_path      = aws_ssm_parameter.data_path.value
   })
 
   content_type = "text/plain"
