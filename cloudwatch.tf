@@ -23,8 +23,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_usage" {
   alarm_description   = "This metric alarm keeps a watch on Memory usage and send Email Notification"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
-  metric_name         = "mem_used_percent"
-  namespace           = "CWAgent"
+  metric_name         = "MongoDBMemUsedPercent"
+  namespace           = "MongoDBMetrics"
   period              = 60
   statistic           = "Average"
   threshold           = var.memory_threshold
@@ -43,8 +43,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_usage" {
   alarm_description   = "This metric alarm keeps a watch on Disk usage and send Email Notification"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
-  metric_name         = "disk_used_percent"
-  namespace           = "CWAgent"
+  metric_name         = "MongoDBDiskUsedPercent"
+  namespace           = "MongoDBMetrics"
   period              = 60
   statistic           = "Average"
   threshold           = var.disk_threshold
