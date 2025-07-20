@@ -22,18 +22,15 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-# Define package manager options to prevent interactive prompts
-PKG_OPTS='-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
-
 cd /home/ubuntu
 
 # Update package lists and handle potential kernel updates
 sudo apt update 
-sudo apt-get -y $PKG_OPTS upgrade --no-install-recommends
+sudo apt-get -y upgrade --no-install-recommends -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 # Install tools required in the script ahead
-sudo apt-get install -y $PKG_OPTS --no-install-recommends wget curl gpg gnupg net-tools unzip
-sudo apt-get install -y $PKG_OPTS --no-install-recommends e2fsprogs coreutils python3 python3-pip cron
+sudo apt-get install -y --no-install-recommends wget curl gpg gnupg net-tools unzip -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+sudo apt-get install -y --no-install-recommends e2fsprogs coreutils python3 python3-pip cron -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 # Install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -109,7 +106,7 @@ echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gp
 sudo apt-get update
 
 # Install MongoDB
-sudo apt-get install -y $PKG_OPTS --no-install-recommends mongodb-org
+sudo apt-get install -y --no-install-recommends mongodb-org -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 # Set correct ownership and permissions for MongoDB
 sudo chown -R mongodb:mongodb "$MOUNT_PATH"
