@@ -107,6 +107,11 @@ variable "cpu_threshold" {
   default     = 60
 }
 
+variable "ami_id" {
+  type        = string
+  description = "AMI ID to use for MongoDB (if not specified latest ubuntu 22.04 image is used)"
+  default     = null
+}
 
 variable "memory_threshold" {
   type        = number

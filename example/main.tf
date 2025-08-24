@@ -8,7 +8,7 @@ data "aws_ssm_parameter" "mongo_password" {
 }
 
 module "mongodb" {
-  source = "git::https://github.com/credeau/terraform-aws-mongo-single-node.git?ref=v1.0.2"
+  source = "git::https://github.com/credeau/terraform-aws-mongo-single-node.git?ref=v1.0.4"
 
   application                            = "mobile-forge"
   environment                            = "prod"
@@ -17,6 +17,7 @@ module "mongodb" {
   stack_team                             = "devops"
   organization                           = "credeau"
   alert_email_recipients                 = []
+  ami_id                                 = null
   vpc_id                                 = "vpc-00000000000000000"
   subnet_id                              = "subnet-00000000000000000"
   mongodb_whitelisted_cidrs              = ["52.52.0.0/16"]
